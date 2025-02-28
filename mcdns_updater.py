@@ -74,6 +74,8 @@ def update_record(
 
     fqdn = concat_domain("_minecraft._tcp", subdomain, zone.name)
 
+    print(f"updating {fqdn} SRV record to {host}:{port}...")
+
     records = cloudflare.dns.records.list(
         zone_id=zone_id,
         name=record_list_params.Name(exact=fqdn),
@@ -89,8 +91,9 @@ def update_record(
         commit_dns_record = cloudflare.dns.records.create
 
     data = srv_record_param.Data(target=host, port=port, priority=0, weight=0)
-
     commit_dns_record(zone_id=zone_id, name=fqdn, data=data, type="SRV")
+
+    print(f"{fqdn} SRV record updated.")
 
 
 eprint = functools.partial(print, file=sys.stderr)
