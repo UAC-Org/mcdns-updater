@@ -3,7 +3,7 @@ import ipaddress
 import sys
 
 from cloudflare import Cloudflare
-from cloudflare.types.dns import record_list_params, srv_record_param
+from cloudflare.types.dns import record_list_params, srv_record, srv_record_param
 from mcstatus import JavaServer
 from pydantic import BaseModel, field_validator
 
@@ -84,8 +84,20 @@ def update_record(
     )
 
     if records.result:
+        record = records.result[0]
+
+        if isinstance(record, srv_record.SRVRecord):
+            assert record.data and record.data.target and record.data.port
+            update_needed = (record.data.target, record.data.port) != (host, port)
+        else:
+            update_needed = True
+
+        if not update_needed:
+            print(f"ignored update for {fqdn}.")
+            return
+
         commit_dns_record = functools.partial(
-            cloudflare.dns.records.update, dns_record_id=records.result[0].id
+            cloudflare.dns.records.update, dns_record_id=record.id
         )
     else:
         commit_dns_record = cloudflare.dns.records.create
