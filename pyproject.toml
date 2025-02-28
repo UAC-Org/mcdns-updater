@@ -6,6 +6,6 @@ authors = [
     {name = "Ricky8955555", email = "rkmiao@duck.com"},
 ]
 dependencies = ["pydantic~=2.0", "cloudflare~=4.0", "mcstatus~=11.0"]
-requires-python = "==3.12.*"
+requires-python = ">=3.10,<3.13"
 readme = "README.md"
 license = {text = "Apache-2.0"}
